@@ -37,7 +37,7 @@ function showPage(pageId, event) {
 }
 
 // 藥物迷思測驗資料
-const quizQuestions = [
+let quizQuestions = [
     {
         category: "成癮與生理機制",
         question: "偶爾使用毒品不會上癮？",
@@ -114,7 +114,19 @@ let currentQuizIndex = 0;
 let quizScore = 0;
 let quizAnswers = [];
 
-function startQuiz() {
+async function loadQuizQuestions() {
+    try {
+        const response = await fetch('http://127.0.0.1:5000/api/quiz');
+        quizQuestions = await response.json();
+        console.log('Quiz 題庫已從後端載入', quizQuestions);
+    } catch (error) {
+        console.error('載入 Quiz 題庫失敗，使用前端預設題庫:', error);
+    }
+}
+
+async function startQuiz() {
+    await loadQuizQuestions();
+    
     currentQuizIndex = 0;
     quizScore = 0;
     quizAnswers = [];
