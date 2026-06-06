@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>毒品防制資訊整合平台</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header class="bg-gradient-to-r from-blue-800 to-blue-600 text-white shadow-lg sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <h1 class="text-2xl md:text-3xl font-bold mb-2 md:mb-0">毒品防制資訊整合平台</h1>
+                <nav class="flex flex-wrap gap-2">
+                    <button class="nav-link px-4 py-2 rounded-lg bg-blue-700 hover:bg-blue-500 active" onclick="showPage('home', event)">首頁</button>
+                    <button class="nav-link px-4 py-2 rounded-lg bg-blue-700 hover:bg-blue-500" onclick="showPage('quiz', event)">互動式藥物迷思測驗</button>
+                    <button class="nav-link px-4 py-2 rounded-lg bg-blue-700 hover:bg-blue-500" onclick="showPage('map', event)">防制資源地圖</button>
+                    <button class="nav-link px-4 py-2 rounded-lg bg-blue-700 hover:bg-blue-500" onclick="showPage('prevention', event)">反毒預防力測驗</button>
+                    <button class="nav-link px-4 py-2 rounded-lg bg-blue-700 hover:bg-blue-500" onclick="showPage('help', event)">匿名求助小工具</button>
+                    <button class="nav-link px-4 py-2 rounded-lg bg-blue-700 hover:bg-blue-500" onclick="showPage('analytics', event)">數據分析</button>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto p-4 md:p-8">
+        <div id="home" class="page active fade-in">
+            <section class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-6">
+                <h2 class="text-2xl font-bold mb-4 text-blue-900 border-l-4 border-blue-500 pl-3">平台宗旨</h2>
+                <p class="text-gray-700 leading-relaxed text-lg mb-4">
+                    本平台致力於破除藥物濫用迷思，透過「地圖視覺化」讓青少年與家長快速找到校園周邊的防制資源，降低求助門檻。
+                </p>
+                <div class="grid md:grid-cols-3 gap-4 mt-6">
+                    <div class="bg-blue-50 p-4 rounded-lg border border-blue-200 cursor-pointer hover:bg-blue-100 transition" onclick="showPage('quiz', event)">
+                        <h3 class="font-bold text-blue-900 mb-2">🎯 破除迷思</h3>
+                        <p class="text-sm text-gray-600">透過互動式問答遊戲，即時提供正確科普知識</p>
+                    </div>
+                    <div class="bg-green-50 p-4 rounded-lg border border-green-200 cursor-pointer hover:bg-green-100 transition" onclick="showPage('map', event)">
+                        <h3 class="font-bold text-green-900 mb-2">📍 資源整合</h3>
+                        <p class="text-sm text-gray-600">地圖視覺化標註各縣市戒治、輔導與教育單位</p>
+                    </div>
+                    <div class="bg-purple-50 p-4 rounded-lg border border-purple-200 cursor-pointer hover:bg-purple-100 transition" onclick="showPage('help', event)">
+                        <h3 class="font-bold text-purple-900 mb-2">🤝 匿名協助</h3>
+                        <p class="text-sm text-gray-600">降低求助心理障礙，提供安全匿名管道</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                <h2 class="text-xl font-bold mb-4 text-blue-900">競爭優勢</h2>
+                <div class="space-y-3">
+                    <div class="flex items-start gap-3">
+                        <span class="text-2xl">✅</span>
+                        <div>
+                            <h3 class="font-semibold">資訊統整</h3>
+                            <p class="text-sm text-gray-600">相較於政府資源網站資訊龐雜、互動性不足，本平台提供清晰、易用的介面</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-3">
+                        <span class="text-2xl">✅</span>
+                        <div>
+                            <h3 class="font-semibold">即時互動</h3>
+                            <p class="text-sm text-gray-600">透過測驗與遊戲化設計，提升使用者參與度與學習效果</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-3">
+                        <span class="text-2xl">✅</span>
+                        <div>
+                            <h3 class="font-semibold">數據驅動</h3>
+                            <p class="text-sm text-gray-600">彙整使用者互動紀錄，提供教育單位改善教材依據</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+<div id="quiz" class="page fade-in">
+    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+        <h2 class="text-2xl font-bold mb-4 text-blue-900">互動式藥物迷思測驗</h2>
+        <div id="quiz-container">
+            <div id="quiz-start" class="text-center py-8">
+                <p class="text-lg text-gray-700 mb-6">透過問答遊戲破除錯誤觀念，即時獲得正確科普知識</p>
+                <button onclick="startQuiz()" class="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 text-lg font-semibold">
+                    開始測驗
+                </button>
+            </div>
+            
+            <div id="quiz-content" style="display: none;">
+                <div class="mb-4">
+                    <div id="quiz-category-container" class="mb-2">
+                        <span id="quiz-category-tag" class="px-3 py-1 rounded-full text-xs font-bold shadow-sm border border-gray-200"></span>
+                    </div>
+                    
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-sm text-gray-600">進度</span>
+                        <span id="quiz-progress" class="text-sm font-semibold">1 / 10</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2">
+                        <div id="quiz-progress-bar" class="bg-blue-600 h-2 rounded-full transition-all duration-300" style="width: 10%"></div>
+                    </div>
+                </div>
+                
+                <h3 id="quiz-question" class="text-xl font-bold mb-6 text-gray-800"></h3>
+                <div id="quiz-options" class="space-y-3"></div>
+                <div id="quiz-result" class="mt-6 p-4 rounded-lg hidden"></div>
+            </div>
+
+            <div id="quiz-complete" style="display: none;">
+                <div class="text-center py-8">
+                    <h3 class="text-2xl font-bold mb-4 text-green-600">測驗完成！</h3>
+                    <p id="quiz-score" class="text-lg mb-6"></p>
+                    
+                    <div class="flex justify-center gap-4">
+                        <button onclick="resetQuiz()" class="bg-gray-500 text-white px-6 py-2 rounded-lg hover:bg-gray-600 transition">
+                            重新測驗
+                        </button>
+                        
+                        <button onclick="showPage('analytics', event)" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition shadow-md">
+                            📊 查看數據分析
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+        <div id="map" class="page fade-in">
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-6">
+                <h2 class="text-2xl font-bold mb-4 text-blue-900">防制資源地圖</h2>
+                <div class="mb-4 flex flex-wrap gap-2">
+                    <button onclick="filterResources('all')" class="filter-btn px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700" data-filter="all">全部</button>
+                    <button onclick="filterResources('醫療')" class="filter-btn px-4 py-2 rounded-lg bg-gray-200 text-gray-700 hover:bg-gray-300" data-filter="醫療">醫療</button>
+                    <button onclick="filterResources('社福')" class="filter-btn px-4 py-2 rounded-lg bg-gray-200 text-gray-700 hover:bg-gray-300" data-filter="社福">社福</button>
+                    <button onclick="filterResources('輔導')" class="filter-btn px-4 py-2 rounded-lg bg-gray-200 text-gray-700 hover:bg-gray-300" data-filter="輔導">輔導</button>
+                </div>
+            </div>
+            <div class="grid lg:grid-cols-3 gap-8">
+                <div class="lg:col-span-2 space-y-4">
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+                        <div id="map-container"></div>
+                    </div>
+                </div>
+                <div class="space-y-4">
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                        <h2 class="text-lg font-bold mb-4">在地資源列表</h2>
+                        <div id="resource-list" class="space-y-3 overflow-y-auto max-h-[500px]"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="prevention" class="page fade-in">
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                <h2 class="text-2xl font-bold mb-4 text-blue-900">反毒預防力測驗</h2>
+                <p class="text-gray-600 mb-6">評估您在「資訊判斷」、「情緒管理」與「人際界線」三個面向的預防力</p>
+                <div id="prevention-container">
+                    <div id="prevention-start" class="text-center py-8">
+                        <button onclick="startPreventionTest()" class="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 text-lg font-semibold">
+                            開始評估
+                        </button>
+                    </div>
+                    <div id="prevention-content" style="display: none;">
+                        <div class="mb-4">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-sm text-gray-600">進度</span>
+                                <span id="prevention-progress" class="text-sm font-semibold">1 / 9</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2">
+                                <div id="prevention-progress-bar" class="bg-blue-600 h-2 rounded-full transition-all duration-300" style="width: 11%"></div>
+                            </div>
+                        </div>
+                        <h3 id="prevention-question" class="text-xl font-bold mb-2 text-gray-800"></h3>
+                        <p id="prevention-category" class="text-sm text-blue-600 mb-6"></p>
+                        <div id="prevention-options" class="space-y-3"></div>
+                    </div>
+                    <div id="prevention-results" style="display: none;">
+                        <div class="py-8">
+                            <h3 class="text-2xl font-bold mb-6 text-center text-blue-900">評估結果</h3>
+                            <div id="prevention-scores" class="space-y-4 mb-6"></div>
+                            <div id="prevention-interpretation" class="bg-blue-50 p-6 rounded-lg border border-blue-200"></div>
+                            <div class="text-center mt-6">
+                                <button onclick="resetPreventionTest()" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">
+                                    重新評估
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="help" class="page fade-in">
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                <h2 class="text-2xl font-bold mb-4 text-blue-900">匿名求助</h2>
+                <p class="text-gray-600 mb-6">我們提供安全的匿名管道，降低求助心理障礙。您的訊息將被保密處理。</p>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div>
+                        <h3 class="text-lg font-semibold mb-4">留言諮詢</h3>
+                        <form id="help-form" class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">問題類型</label>
+                                <select id="help-type" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                    <option value="諮詢">一般諮詢</option>
+                                    <option value="轉介">需要轉介</option>
+                                    <option value="資訊">資訊需求</option>
+                                    <option value="其他">其他</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">訊息內容</label>
+                                <textarea id="help-message" rows="6" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="請描述您的問題或需求..."></textarea>
+                            </div>
+                            <button type="submit" class="w-full bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 font-semibold">
+                                匿名提交
+                            </button>
+                        </form>
+                        <div id="help-success" class="hidden mt-4 p-4 bg-green-50 border border-green-200 rounded-lg text-green-700">
+                            <p class="font-semibold">✓ 訊息已成功提交！我們會盡快處理您的需求。</p>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold mb-4">緊急聯絡資源</h3>
+                        <div class="space-y-3">
+                            <div class="p-4 bg-red-50 border border-red-200 rounded-lg">
+                                <h4 class="font-bold text-red-900 mb-1">24小時專線</h4>
+                                <p class="text-red-700 font-mono text-lg">0800-770-885</p>
+                                <p class="text-sm text-gray-600 mt-1">毒品危害防制諮詢專線</p>
+                            </div>
+                            <div class="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                                <h4 class="font-bold text-blue-900 mb-1">生命線</h4>
+                                <p class="text-blue-700 font-mono text-lg">1995</p>
+                                <p class="text-sm text-gray-600 mt-1">24小時心理諮詢服務</p>
+                            </div>
+                            <div class="p-4 bg-green-50 border border-green-200 rounded-lg">
+                                <h4 class="font-bold text-green-900 mb-1">張老師專線</h4>
+                                <p class="text-green-700 font-mono text-lg">1980</p>
+                                <p class="text-sm text-gray-600 mt-1">輔導諮詢服務</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    <div id="analytics" class="page fade-in">
+    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+        <h2 class="text-2xl font-bold mb-4 text-blue-900">📊 預防力大數據儀表板</h2>
+        <p class="text-gray-600 mb-8">透過深度數據分析，我們能更精準地了解您的防護層級，並針對薄弱環節提供支援。</p>
+        
+        <div class="grid md:grid-cols-2 gap-6 mb-8">
+            <div class="bg-gradient-to-br from-blue-500 to-blue-700 p-6 rounded-2xl text-white shadow-lg">
+                <h3 class="opacity-80 text-sm font-medium mb-1">平台總參與人數</h3>
+                <p class="text-4xl font-bold" id="total-users">0</p>
+            </div>
+            <div class="bg-gradient-to-br from-green-500 to-green-700 p-6 rounded-2xl text-white shadow-lg">
+                <h3 class="opacity-80 text-sm font-medium mb-1">累計測驗完成次數</h3>
+                <p class="text-4xl font-bold" id="total-quizzes">0</p>
+            </div>
+        </div>
+
+        <div class="grid lg:grid-cols-3 gap-8">
+            <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm">
+                <h3 class="font-bold text-gray-800 mb-4 flex items-center">
+                    <span class="mr-2">🧩</span> 常見迷思排行
+                </h3>
+                <div style="height:350px;">
+                    <canvas id="myth-chart"></canvas>
+                </div>
+            </div>
+            
+            <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm">
+    <h3 class="font-bold text-gray-800 flex items-center mb-4">
+        <span class="mr-2">🛡️</span> 四大維度預防力分布
+    </h3>
+    <div style="position: relative; height: 350px; width: 100%;">
+        <canvas id="prevention-chart"></canvas>
+    </div>
+</div>
+                
+                <div class="grid md:grid-cols-2 gap-6 items-center">
+                    <div style="height:350px;">
+                        <canvas id="prevention-chart"></canvas>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <div id="strength-card" class="p-4 bg-green-50 border border-green-100 rounded-xl">
+                            <h4 class="text-green-700 font-bold text-sm mb-1">💪 您的優勢面向</h4>
+                            <p id="top-strength" class="text-gray-700 text-sm">正在計算中...</p>
+                        </div>
+                        <div id="weakness-card" class="p-4 bg-red-50 border border-red-100 rounded-xl">
+                            <h4 class="text-red-700 font-bold text-sm mb-1">⚠️ 建議補強面向</h4>
+                            <p id="top-weakness" class="text-gray-700 text-sm">正在計算中...</p>
+                        </div>
+                        <div class="p-4 bg-blue-50 border border-blue-100 rounded-xl">
+                            <h4 class="text-blue-700 font-bold text-sm mb-1">💡 專家建議</h4>
+                            <p class="text-gray-700 text-xs leading-relaxed">您的數據顯示在環境辨識上略低於平均。建議可與 Gemini AI 聊聊「如何拒絕派對中的不明物質」。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+    </main>
+
+    <footer class="bg-gray-800 text-white mt-12 py-6">
+        <div class="container mx-auto px-4 text-center">
+            <p class="text-sm opacity-75">團隊：ADHD2/3 | 整合在地資源與正確宣導資訊</p>
+            <p class="text-xs mt-2 opacity-60">本平台僅供教育與資訊參考，如有緊急情況請撥打專線求助</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+    <div id="chatbot-window" class="chatbot-hidden">
+    <div id="app"></div>
+</div>
+
+<button id="chatbot-toggle" onclick="toggleChatbot()">
+    <span class="open-icon">💬</span>
+    <span class="close-icon">✕</span>
+</button>
+
+<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+<script src="https://cdn.jsdelivr.net/npm/vue3-sfc-loader/dist/vue3-sfc-loader.js"></script>
+
+<script src="app.js"></script>
+</body>
+</html>
