@@ -1,7 +1,34 @@
+# 環境變數（含 API Key，絕對不能 commit）
 .env
+.env.*
+!.env.example
+
+# Python
 __pycache__/
 *.pyc
 *.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
 .venv/
 venv/
+env/
+
+# MongoDB 本地資料
+data/
+
+# 作業系統
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# 編輯器
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Node
 node_modules/
