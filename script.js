@@ -352,12 +352,12 @@ function showPreventionResults() {
     console.log('showPreventionResults: preventionScores =', preventionScores);
     trackEvent('prevention_test_completed', preventionScores);
     trackPreventionScore(preventionScores);
-    fetch('http://127.0.0.1:5000/api/quiz-result', {
+    fetch('http://127.0.0.1:5000/api/prevention/submit', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify(preventionScores) // 把這四個維度的分數打包成 JSON 送出
+        body: JSON.stringify({ scores: preventionScores })
     })
     .then(response => response.json())
     .then(data => {
