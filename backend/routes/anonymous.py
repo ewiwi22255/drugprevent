@@ -17,7 +17,7 @@ def submit_anonymous():
     data = request.get_json()
 
     if not data or not data.get("message"):
-        return jsonify({"error": "message 不能為空"}), 400
+        return jsonify({"success": False, "error": "message 不能為空"}), 400
 
     db.anonymous_messages.insert_one({
         "type"      : data.get("type", "其他"),

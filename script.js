@@ -37,7 +37,7 @@ function showPage(pageId, event) {
 }
 
 // 藥物迷思測驗資料
-const quizQuestions = [
+let quizQuestions = [
     {
         category: "成癮與生理機制",
         question: "偶爾使用毒品不會上癮？",
@@ -114,7 +114,19 @@ let currentQuizIndex = 0;
 let quizScore = 0;
 let quizAnswers = [];
 
-function startQuiz() {
+async function loadQuizQuestions() {
+    try {
+        const response = await fetch('http://127.0.0.1:5000/api/quiz');
+        quizQuestions = await response.json();
+        console.log('Quiz 題庫已從後端載入', quizQuestions);
+    } catch (error) {
+        console.error('載入 Quiz 題庫失敗，使用前端預設題庫:', error);
+    }
+}
+
+async function startQuiz() {
+    await loadQuizQuestions();
+    
     currentQuizIndex = 0;
     quizScore = 0;
     quizAnswers = [];
@@ -490,48 +502,42 @@ function filterResources(type) {
 }
 
 // 修改 script.js 中的求助表單監聽器
-document.getElementById('help-form').addEventListener('submit', function(e) {
+document.getElementById('help-form').addEventListener('submit', async function(e) {
     e.preventDefault();
-    
-    const submitBtn = this.querySelector('button[type="submit"]');
+
     const helpType = document.getElementById('help-type').value;
     const helpMessage = document.getElementById('help-message').value;
     const successMsg = document.getElementById('help-success');
 
-    // 防止重複送出
-    submitBtn.disabled = true;
-    submitBtn.textContent = '傳送中...';
+    if (!helpMessage.trim()) {
+        alert('請輸入求助內容');
+        return;
+    }
 
-    // 替換為你的 Google Apps Script URL
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbwAYMmHMsymrTVlFIu7BSsRqW7TWjnAbYD3wYrfU0NmT7SSI23BJjWhvlbXKS3fBIimww/exec';
+    try {
+        const response = await fetch('http://127.0.0.1:5000/api/anonymous', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                type: helpType,
+                message: helpMessage
+            })
+        });
 
-    // 建立表單資料
-    const formData = new URLSearchParams();
-    formData.append('type', helpType);
-    formData.append('message', helpMessage);
+        const result = await response.json();
 
-    fetch(scriptURL, {
-        method: 'POST',
-        mode: 'no-cors', // 解決跨網域問題
-        body: formData
-    })
-    .then(() => {
-        // 顯示成功訊息
-        successMsg.classList.remove('hidden');
-        this.reset();
-        
-        // 恢復按鈕
-        submitBtn.disabled = false;
-        submitBtn.textContent = '匿名提交';
-        
-        setTimeout(() => successMsg.classList.add('hidden'), 5000);
-    })
-    .catch(error => {
-        console.error('Error!', error.message);
-        alert('送出失敗，請稍後再試或撥打專線。');
-        submitBtn.disabled = false;
-        submitBtn.textContent = '匿名提交';
-    });
+        if (result.success) {
+            successMsg.classList.remove('hidden');
+            document.getElementById('help-form').reset();
+        } else {
+            alert('送出失敗，請稍後再試');
+        }
+    } catch (error) {
+        console.error('匿名求助送出錯誤:', error);
+        alert('無法連接後端，請確認 Flask 是否正在執行');
+    }
 });
 
 function updateAnalytics() {
