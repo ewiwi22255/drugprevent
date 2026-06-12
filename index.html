@@ -254,7 +254,7 @@
         <h2 class="text-2xl font-bold mb-4 text-blue-900">📊 預防力大數據儀表板</h2>
         <p class="text-gray-600 mb-8">透過深度數據分析，我們能更精準地了解您的防護層級，並針對薄弱環節提供支援。</p>
         
-        <div class="grid md:grid-cols-2 gap-6 mb-8">
+        <div class="grid md:grid-cols-3 gap-6 mb-8">
             <div class="bg-gradient-to-br from-blue-500 to-blue-700 p-6 rounded-2xl text-white shadow-lg">
                 <h3 class="opacity-80 text-sm font-medium mb-1">平台總參與人數</h3>
                 <p class="text-4xl font-bold" id="total-users">0</p>
@@ -263,9 +263,13 @@
                 <h3 class="opacity-80 text-sm font-medium mb-1">累計測驗完成次數</h3>
                 <p class="text-4xl font-bold" id="total-quizzes">0</p>
             </div>
+            <div class="bg-gradient-to-br from-indigo-500 to-indigo-700 p-6 rounded-2xl text-white shadow-lg">
+                <h3 class="opacity-80 text-sm font-medium mb-1">防制資源據點總數</h3>
+                <p class="text-4xl font-bold" id="total-resources">0</p>
+            </div>
         </div>
 
-        <div class="grid lg:grid-cols-3 gap-8">
+        <div class="grid lg:grid-cols-2 gap-8 mb-8">
             <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm">
                 <h3 class="font-bold text-gray-800 mb-4 flex items-center">
                     <span class="mr-2">🧩</span> 常見迷思排行
@@ -274,36 +278,29 @@
                     <canvas id="myth-chart"></canvas>
                 </div>
             </div>
-            
+
             <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm">
-    <h3 class="font-bold text-gray-800 flex items-center mb-4">
-        <span class="mr-2">🛡️</span> 四大維度預防力分布
-    </h3>
-    <div style="position: relative; height: 350px; width: 100%;">
-        <canvas id="prevention-chart"></canvas>
-    </div>
-</div>
-                
-                <div class="grid md:grid-cols-2 gap-6 items-center">
-                    <div style="height:350px;">
-                        <canvas id="prevention-chart"></canvas>
-                    </div>
-                    
-                    <div class="space-y-4">
-                        <div id="strength-card" class="p-4 bg-green-50 border border-green-100 rounded-xl">
-                            <h4 class="text-green-700 font-bold text-sm mb-1">💪 您的優勢面向</h4>
-                            <p id="top-strength" class="text-gray-700 text-sm">正在計算中...</p>
-                        </div>
-                        <div id="weakness-card" class="p-4 bg-red-50 border border-red-100 rounded-xl">
-                            <h4 class="text-red-700 font-bold text-sm mb-1">⚠️ 建議補強面向</h4>
-                            <p id="top-weakness" class="text-gray-700 text-sm">正在計算中...</p>
-                        </div>
-                        <div class="p-4 bg-blue-50 border border-blue-100 rounded-xl">
-                            <h4 class="text-blue-700 font-bold text-sm mb-1">💡 專家建議</h4>
-                            <p class="text-gray-700 text-xs leading-relaxed">您的數據顯示在環境辨識上略低於平均。建議可與 Gemini AI 聊聊「如何拒絕派對中的不明物質」。</p>
-                        </div>
-                    </div>
+                <h3 class="font-bold text-gray-800 mb-4 flex items-center">
+                    <span class="mr-2">🛡️</span> 三維度預防力分布
+                </h3>
+                <div style="position: relative; height: 350px; width: 100%;">
+                    <canvas id="prevention-chart"></canvas>
                 </div>
+            </div>
+        </div>
+
+        <div class="grid md:grid-cols-3 gap-6">
+            <div id="strength-card" class="p-4 bg-green-50 border border-green-100 rounded-xl">
+                <h4 class="text-green-700 font-bold text-sm mb-1">💪 您的優勢面向</h4>
+                <p id="top-strength" class="text-gray-700 text-sm">正在計算中...</p>
+            </div>
+            <div id="weakness-card" class="p-4 bg-red-50 border border-red-100 rounded-xl">
+                <h4 class="text-red-700 font-bold text-sm mb-1">⚠️ 建議補強面向</h4>
+                <p id="top-weakness" class="text-gray-700 text-sm">正在計算中...</p>
+            </div>
+            <div class="p-4 bg-blue-50 border border-blue-100 rounded-xl">
+                <h4 class="text-blue-700 font-bold text-sm mb-1">💡 專家建議</h4>
+                <p class="text-gray-700 text-xs leading-relaxed">您的數據顯示在環境辨識上略低於平均。建議可與 Gemini AI 聊聊「如何拒絕派對中的不明物質」。</p>
             </div>
         </div>
     </div>
