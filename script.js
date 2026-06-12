@@ -534,11 +534,36 @@ document.getElementById('help-form').addEventListener('submit', function(e) {
     });
 });
 
+// 平台統計快取（來自後端 GET /api/stats）；連線失敗時為 null，各圖表自動 fallback 回 localStorage。
+let platformStats = null;
+
+async function fetchStats() {
+    try {
+        const res = await fetch(`${API_BASE}/api/stats`);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        platformStats = await res.json();
+    } catch (e) {
+        console.warn('[stats] 後端 API 無法連線，儀表板改用本機資料：', e.message);
+        platformStats = null;
+    }
+    return platformStats;
+}
+
 function updateAnalytics() {
     const participants = JSON.parse(localStorage.getItem('afp_participants') || '[]');
-    const quizzes = localStorage.getItem('afp_totalQuizzes') || '0';
+    const localQuizzes = parseInt(localStorage.getItem('afp_totalQuizzes') || '0', 10);
+
+    // 累計測驗次數：後端有紀錄時以後端為準，否則用本機計數
+    const quizzes = (platformStats && platformStats.total_quizzes)
+        ? platformStats.total_quizzes
+        : localQuizzes;
+    // 資源據點總數：純後端資料（GET /api/stats -> total_resources）
+    const resources = (platformStats && platformStats.total_resources) || 0;
+
     document.getElementById('total-users').textContent = participants.length;
     document.getElementById('total-quizzes').textContent = quizzes;
+    const resEl = document.getElementById('total-resources');
+    if (resEl) resEl.textContent = resources;
 }
 
 // Chart.js 圖表實例
@@ -549,7 +574,11 @@ function renderMythChart() {
     const ctxEl = document.getElementById('myth-chart');
     if (!ctxEl) return;
     const ctx = ctxEl.getContext && ctxEl.getContext('2d') || ctxEl;
-    const categoryErrors = JSON.parse(localStorage.getItem('mythErrorsByCategory') || '{}');
+    // 優先採用後端平台統計（所有使用者累計答錯）；無資料時 fallback 回本機紀錄
+    const platformErrors = platformStats && platformStats.myth_errors;
+    const categoryErrors = (platformErrors && Object.keys(platformErrors).length)
+        ? platformErrors
+        : JSON.parse(localStorage.getItem('mythErrorsByCategory') || '{}');
     const labels = Object.keys(categoryErrors);
     const data = Object.values(categoryErrors);
 
@@ -591,17 +620,28 @@ function renderPreventionChart() {
     ];
     const maxPerCategory = 8; // 原始每類最大分
 
-    // 計算平台平均（以百分比表示）
-    const sumsByGroup = groups.map(g => 0);
-    history.forEach(entry => {
-        groups.forEach((g, gi) => {
-            g.keys.forEach(k => { sumsByGroup[gi] += (entry[k] || 0); });
+    // 平台平均（百分比）：優先用後端 /api/stats 的 prevention_avg（各維度平均原始分）
+    const platformAvg = platformStats && platformStats.prevention_avg;
+    const hasPlatformAvg = platformAvg && Object.values(platformAvg).some(v => v > 0);
+    let averageData;
+    if (hasPlatformAvg) {
+        averageData = groups.map(g => {
+            const total = g.keys.reduce((sum, k) => sum + (platformAvg[k] || 0), 0);
+            const groupMax = g.keys.length * maxPerCategory;
+            return Math.round((total / groupMax) * 100);
         });
-    });
-    const averageData = groups.map((g, gi) => {
-        const groupMax = g.keys.length * maxPerCategory;
-        return Math.round((sumsByGroup[gi] / history.length / groupMax) * 100);
-    });
+    } else {
+        const sumsByGroup = groups.map(() => 0);
+        history.forEach(entry => {
+            groups.forEach((g, gi) => {
+                g.keys.forEach(k => { sumsByGroup[gi] += (entry[k] || 0); });
+            });
+        });
+        averageData = groups.map((g, gi) => {
+            const groupMax = g.keys.length * maxPerCategory;
+            return Math.round((sumsByGroup[gi] / history.length / groupMax) * 100);
+        });
+    }
 
     // 取最新一筆使用者資料並計算百分比
     const latest = history[history.length - 1] || {};
@@ -674,9 +714,9 @@ function renderPreventionChart() {
     });
 }
 
-// 更新儀表板數值 + 圖表
-function refreshAnalyticsDashboard() {
-    console.log('refreshAnalyticsDashboard called');
+// 更新儀表板數值 + 圖表（先抓後端統計，再渲染）
+async function refreshAnalyticsDashboard() {
+    await fetchStats();
     updateAnalytics();
     renderMythChart();
     renderPreventionChart();
