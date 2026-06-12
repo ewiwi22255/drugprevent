@@ -364,6 +364,20 @@ function showPreventionResults() {
     console.log('showPreventionResults: preventionScores =', preventionScores);
     trackEvent('prevention_test_completed', preventionScores);
     trackPreventionScore(preventionScores);
+    fetch('http://127.0.0.1:5000/api/prevention/submit', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ scores: preventionScores })
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('【前端收到後端同步回應】:', data);
+    })
+    .catch(error => {
+        console.error('【同步至後端失敗】:', error);
+    });
 }
 
 function generateInterpretation(scores) {

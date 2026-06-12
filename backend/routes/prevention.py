@@ -20,7 +20,7 @@ prevention_bp = Blueprint("prevention", __name__)
 
 @prevention_bp.route("/prevention/submit", methods=["POST"])
 def submit_prevention():
-    db   = get_db()
+    db = get_db()
     data = request.get_json()
 
     if not data or "scores" not in data:
@@ -31,4 +31,4 @@ def submit_prevention():
         "created_at": datetime.now(timezone.utc),
     })
 
-    return jsonify({"success": True}), 201
+    return jsonify({"success": True, "message": "測驗結果已儲存"}), 201
