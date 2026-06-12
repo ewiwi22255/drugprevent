@@ -7,6 +7,7 @@ GET /api/stats
   - 累計測驗次數
   - 各迷思類別答錯次數
   - 預防力各維度平均分
+  - 防制資源總數與各類型數量（供地圖頁顯示）
 """
 from flask import Blueprint, jsonify
 from backend.db import get_db
@@ -19,6 +20,14 @@ def get_stats():
     db = get_db()
 
     total_quizzes = db.quiz_results.count_documents({})
+
+    # 防制資源統計：總數 + 依類型分組
+    resource_counts: dict = {}
+    for row in db.resources.aggregate([
+        {"$group": {"_id": "$type", "count": {"$sum": 1}}}
+    ]):
+        resource_counts[row["_id"] or "其他"] = row["count"]
+    total_resources = sum(resource_counts.values())
 
     # 各類別答錯統計
     myth_errors: dict = {}
@@ -43,4 +52,6 @@ def get_stats():
         "total_quizzes"   : total_quizzes,
         "myth_errors"     : myth_errors,
         "prevention_avg"  : prevention_avg,
+        "total_resources" : total_resources,
+        "resource_counts" : resource_counts,
     }), 200

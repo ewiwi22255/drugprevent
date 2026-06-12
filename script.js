@@ -379,7 +379,12 @@ function resetPreventionTest() {
 
 let mapInstance = null;
 let markers = [];
-const resources = [
+
+// 後端 API base：同源時留空（由 Flask 提供）；若前端與後端不同源可改成後端網址。
+const API_BASE = "";
+
+// 內建資源資料：作為後端 API 無法連線時（例如 GitHub Pages 靜態展示）的 fallback。
+const FALLBACK_RESOURCES = [
     // 北部地區
     { name: "基隆市毒品危害防制中心", type: "輔導", city: "基隆市", lat: 25.1276, lng: 121.7391, phone: "02-2456-5515", address: "基隆市七堵區明德一路169號" },
     { name: "台北市立聯合醫院松德院區", type: "醫療", city: "台北市", lat: 25.0245, lng: 121.5775, phone: "02-2726-3141", address: "台北市信義區松德路309號" },
@@ -429,9 +434,27 @@ function initMap() {
     } catch (e) { console.error(e); }
 }
 
-function renderResources(filterType) {
+// 從後端 API 取得資源；type 透過 query 參數傳給 GET /api/resources。
+// 後端無法連線時（靜態展示）退回內建 FALLBACK_RESOURCES 並於前端篩選。
+async function fetchResources(filterType) {
+    const params = new URLSearchParams();
+    if (filterType && filterType !== 'all') params.set('type', filterType);
+    const url = `${API_BASE}/api/resources${params.toString() ? '?' + params.toString() : ''}`;
+    try {
+        const res = await fetch(url);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return await res.json();
+    } catch (e) {
+        console.warn('[resources] 後端 API 無法連線，改用內建資料：', e.message);
+        return filterType === 'all'
+            ? FALLBACK_RESOURCES
+            : FALLBACK_RESOURCES.filter(r => r.type === filterType);
+    }
+}
+
+async function renderResources(filterType) {
     if (!mapInstance) return;
-    const filteredResources = filterType === 'all' ? resources : resources.filter(r => r.type === filterType);
+    const filteredResources = await fetchResources(filterType);
     markers.forEach(m => mapInstance.removeLayer(m));
     markers = [];
     const listContainer = document.getElementById('resource-list');
