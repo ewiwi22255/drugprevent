@@ -28,3 +28,11 @@ We utilized a variety of modern frameworks and libraries to build a high-perform
 | **AI Communication & Rendering** | Axios + Marked + Highlight.js | Handles Gemini API communication, Markdown parsing, and code syntax highlighting. |
 
 ---
+
+## 🌱 專案來源 / Project Origin
+
+本專案改作自原作者的個人專案 [falltwo/falltwo.github.io](https://github.com/falltwo/falltwo.github.io)，並經原作者授權使用。
+
+This project is derived from the original personal project [falltwo/falltwo.github.io](https://github.com/falltwo/falltwo.github.io), used with the original author's permission.
+
+---
