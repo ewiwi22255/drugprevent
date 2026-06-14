@@ -138,10 +138,10 @@ async function startQuiz() {
 }
 // 1. 定義顏色映射表 (使用 Tailwind 類名)
 const categoryColorMap = {
-    "成癮與生理機制": "bg-red-100 text-red-700 border-red-200",
-    "藥物迷思辨析": "bg-blue-100 text-blue-700 border-blue-200",
-    "誘因與環境辨識": "bg-purple-100 text-purple-700 border-purple-200",
-    "復健與心理觀念": "bg-green-100 text-green-700 border-green-200"
+    "成癮與生理機制": "bg-coral-50 text-coral-700 border-coral-100",
+    "藥物迷思辨析": "bg-brand-50 text-brand-700 border-brand-100",
+    "誘因與環境辨識": "bg-amber-50 text-amber-800 border-amber-100",
+    "復健與心理觀念": "bg-emerald-50 text-emerald-700 border-emerald-100"
 };
 
 function showQuizQuestion() {
@@ -163,7 +163,7 @@ function showQuizQuestion() {
     optionsContainer.innerHTML = '';
     question.options.forEach((option, index) => {
         const button = document.createElement('button');
-        button.className = 'quiz-option w-full p-4 text-left border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50';
+        button.className = 'quiz-option w-full p-4 text-left border-2 border-brand-100 rounded-xl hover:border-brand-400 hover:bg-brand-50';
         button.textContent = option;
         button.onclick = () => selectQuizAnswer(index);
         optionsContainer.appendChild(button);
@@ -195,17 +195,17 @@ function selectQuizAnswer(selectedIndex) {
     
     const resultDiv = document.getElementById('quiz-result');
     resultDiv.classList.remove('hidden');
-    resultDiv.className = `mt-6 p-4 rounded-lg ${isCorrect ? 'bg-green-50 border border-green-200 text-green-800' : 'bg-red-50 border border-red-200 text-red-800'}`;
+    resultDiv.className = `mt-6 p-4 rounded-xl ${isCorrect ? 'bg-emerald-50 border border-emerald-200 text-emerald-800' : 'bg-coral-50 border border-coral-200 text-coral-800'}`;
     
     // 插入科普知識內容及「下一題」按鈕
     resultDiv.innerHTML = `
         <p class="font-semibold mb-2">${isCorrect ? '✓ 答對了！' : '✗ 答錯了'}</p>
         <p class="mb-4">${question.explanation}</p>
         <div class="flex flex-wrap gap-2 justify-end">
-            <button onclick="askAIAbout('${question.question}')" class="bg-purple-100 text-purple-700 px-4 py-2 rounded-lg hover:bg-purple-200 text-sm font-medium transition">
+            <button onclick="askAIAbout('${question.question}')" class="bg-brand-100 text-brand-700 px-4 py-2 rounded-full hover:bg-brand-200 text-sm font-medium transition">
                 ✨ 讓 AI 解釋更多
             </button>
-            <button onclick="goToNextQuestion()" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 font-medium transition shadow-md">
+            <button onclick="goToNextQuestion()" class="bg-coral-500 text-white px-6 py-2 rounded-full hover:bg-coral-600 font-medium transition shadow-md">
                 ${currentQuizIndex === quizQuestions.length - 1 ? '查看結果' : '下一題 →'}
             </button>
         </div>
@@ -310,7 +310,7 @@ function showPreventionQuestion() {
     optionsContainer.innerHTML = '';
     question.options.forEach((option, index) => {
         const button = document.createElement('button');
-        button.className = 'quiz-option w-full p-4 text-left border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50';
+        button.className = 'quiz-option w-full p-4 text-left border-2 border-brand-100 rounded-xl hover:border-brand-400 hover:bg-brand-50';
         button.textContent = option;
         button.onclick = () => selectPreventionAnswer(index);
         optionsContainer.appendChild(button);
@@ -344,7 +344,7 @@ function showPreventionResults() {
         const level = percentage >= 70 ? '高' : percentage >= 40 ? '中' : '低';
         const color = percentage >= 70 ? 'green' : percentage >= 40 ? 'yellow' : 'red';
         const scoreDiv = document.createElement('div');
-        scoreDiv.className = 'bg-gray-50 p-4 rounded-lg border border-gray-200';
+        scoreDiv.className = 'bg-brand-50 p-4 rounded-xl border border-brand-100';
         scoreDiv.innerHTML = `
             <div class="flex justify-between items-center mb-2">
                 <h4 class="font-semibold">${category}</h4>
@@ -358,7 +358,7 @@ function showPreventionResults() {
     });
     const interpretation = generateInterpretation(preventionScores);
     document.getElementById('prevention-interpretation').innerHTML = `
-        <h4 class="font-semibold text-blue-900 mb-3">評估說明</h4>
+        <h4 class="font-semibold text-ink mb-3">評估說明</h4>
         <p class="text-gray-700 leading-relaxed">${interpretation}</p>
     `;
     console.log('showPreventionResults: preventionScores =', preventionScores);
@@ -491,8 +491,8 @@ async function renderResources(filterType) {
         markers.push(marker);
         if (listContainer) {
             const card = document.createElement('div');
-            card.className = "p-3 border rounded-lg hover:bg-blue-50 cursor-pointer transition text-sm";
-            card.innerHTML = `<h3 class="font-bold">${res.name}</h3><p class="text-xs text-gray-500">${res.city}</p>`;
+            card.className = "p-3 border border-brand-100 rounded-xl hover:bg-brand-50 hover:border-brand-300 cursor-pointer transition text-sm";
+            card.innerHTML = `<h3 class="font-bold text-ink">${res.name}</h3><p class="text-xs text-ink/50">${res.city}</p>`;
             card.onclick = () => { mapInstance.setView([res.lat, res.lng], 15); marker.openPopup(); };
             listContainer.appendChild(card);
         }
@@ -506,11 +506,11 @@ function filterResources(type) {
     // 更新按鈕狀態
     document.querySelectorAll('.filter-btn').forEach(btn => {
         if(btn.dataset.filter === type) {
-            btn.classList.remove('bg-gray-200', 'text-gray-700');
-            btn.classList.add('bg-blue-600', 'text-white');
+            btn.classList.remove('bg-brand-50', 'text-brand-700');
+            btn.classList.add('bg-brand-600', 'text-white');
         } else {
-            btn.classList.remove('bg-blue-600', 'text-white');
-            btn.classList.add('bg-gray-200', 'text-gray-700');
+            btn.classList.remove('bg-brand-600', 'text-white');
+            btn.classList.add('bg-brand-50', 'text-brand-700');
         }
     });
 }

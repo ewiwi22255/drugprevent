@@ -1,81 +1,112 @@
-#map, #map-container {
-    height: 450px;
-    width: 100%;
-    border-radius: 0.5rem;
-    z-index: 1;
+/* =========================================================
+   毒品防制資訊整合平台 — 設計系統
+   方向：FRANK 式色塊（深青 ink + 珊瑚紅 coral），青少年向、克制
+   旋鈕 VARIANCE 6 / MOTION 3 / DENSITY 4 ｜ 主題鎖淺色
+   注意：色票（brand/coral/ink/paper）定義在 index.html 的 tailwind.config
+   ========================================================= */
+
+:root {
+    --ink: #0a2623;
+    --paper: #f3f6f4;
+    --brand-600: #156b5f;
+    --coral-500: #e54a28;
 }
+
+html { scroll-behavior: smooth; }
 
 body {
-    background-color: #f8fafc;
+    background-color: var(--paper);
+    color: #16302c;
+    font-family: "Noto Sans TC", "Space Grotesk", system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
 }
 
-.page {
-    display: none;
+/* 標題用 Latin display + 中文同字重 */
+h1, h2, h3, h4, .font-display {
+    font-family: "Space Grotesk", "Noto Sans TC", sans-serif;
+    letter-spacing: -0.01em;
 }
 
-.page.active {
-    display: block;
+/* 數字 / 電話 / 統計 */
+.font-mono, .tabular {
+    font-family: "Space Mono", ui-monospace, monospace;
+    font-feature-settings: "tnum";
 }
 
-.nav-link {
-    transition: all 0.3s;
-}
+/* ---------- 分頁切換 ---------- */
+.page { display: none; }
+.page.active { display: block; }
 
-.nav-link.active {
-    background-color: #1e40af;
-}
-
-.quiz-option {
-    transition: all 0.2s;
-}
-
-.quiz-option:hover {
-    transform: translateY(-2px);
-}
-
-.fade-in {
-    animation: fadeIn 0.5s;
-}
-
+.fade-in { animation: fadeIn 0.45s cubic-bezier(0.16, 1, 0.3, 1); }
 @keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
 }
 
-.map-loading {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 450px;
+/* ---------- 導覽列 ---------- */
+.nav-link {
+    position: relative;
+    color: rgba(255, 255, 255, 0.78);
+    font-weight: 500;
+    border-radius: 9999px;
+    transition: color 0.2s, background-color 0.2s;
+}
+.nav-link:hover { color: #fff; background-color: rgba(255, 255, 255, 0.10); }
+.nav-link.active {
+    color: #fff;
+    background-color: var(--coral-500);
+    box-shadow: 0 6px 16px -6px rgba(229, 74, 40, 0.7);
 }
 
-.map-error {
-    padding: 20px;
-    text-align: center;
-    color: #dc2626;
+/* ---------- 色塊紋理：半調點陣（hero 用，取代不當的 stock 照） ---------- */
+.halftone {
+    background-image: radial-gradient(rgba(255, 255, 255, 0.14) 1.4px, transparent 1.5px);
+    background-size: 14px 14px;
 }
 
-/* --- Chatbot 懸浮樣式 --- */
+/* ---------- 互動：測驗 / 預防力選項 ---------- */
+/* 顏色 class 由 script.js 注入（border-brand-… hover），此處只管觸覺 */
+.quiz-option {
+    background: #fff;
+    transition: transform 0.18s cubic-bezier(0.16,1,0.3,1), border-color 0.18s, background-color 0.18s;
+}
+.quiz-option:hover { transform: translateY(-2px); }
+.quiz-option:active { transform: translateY(0) scale(0.99); }
+.quiz-option:disabled { opacity: 0.55; cursor: default; transform: none; }
 
-/* 懸浮按鈕 */
+/* 按鈕觸覺回饋（一致套用主要 CTA） */
+.btn-press { transition: transform 0.15s, box-shadow 0.2s, background-color 0.2s; }
+.btn-press:active { transform: translateY(1px); }
+
+/* 焦點可見（無障礙） */
+a:focus-visible, button:focus-visible, select:focus-visible, textarea:focus-visible {
+    outline: 3px solid var(--coral-500);
+    outline-offset: 2px;
+}
+
+/* ---------- 地圖 ---------- */
+#map, #map-container {
+    height: 460px;
+    width: 100%;
+    border-radius: 0.75rem;
+    z-index: 1;
+}
+.map-loading { display: flex; align-items: center; justify-content: center; height: 460px; }
+.map-error { padding: 20px; text-align: center; color: var(--coral-500); }
+
+/* ---------- Chatbot 懸浮 ---------- */
 #chatbot-toggle {
     position: fixed;
-    bottom: 20px;
-    right: 20px;
+    bottom: 22px;
+    right: 22px;
     width: 60px;
     height: 60px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #2563eb, #1d4ed8);
-    color: white;
-    border: none;
+    background: var(--ink);
+    color: #fff;
+    border: 2px solid var(--coral-500);
     cursor: pointer;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    box-shadow: 0 10px 28px -8px rgba(10, 38, 35, 0.6);
     z-index: 1000;
     display: flex;
     align-items: center;
@@ -83,38 +114,31 @@ body {
     font-size: 24px;
     transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
+#chatbot-toggle:hover { transform: scale(1.08); }
 
-#chatbot-toggle:hover {
-    transform: scale(1.1);
-}
-
-/* 對話視窗容器 */
 #chatbot-window {
     position: fixed;
-    bottom: 90px;
-    right: 20px;
-    width: 380px; /* 寬度稍微縮小以適應懸浮窗 */
+    bottom: 92px;
+    right: 22px;
+    width: 380px;
     max-width: 90vw;
     height: 600px;
     max-height: 70vh;
-    background: white;
-    border-radius: 15px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 18px 50px -12px rgba(10, 38, 35, 0.35);
     z-index: 999;
     overflow: hidden;
-    transition: all 0.3s ease;
+    transition: opacity 0.3s ease, transform 0.3s ease;
     display: flex;
     flex-direction: column;
+    border: 1px solid rgba(10, 38, 35, 0.08);
 }
-
-/* 隱藏狀態 */
 .chatbot-hidden {
     opacity: 0;
-    transform: translateY(20px) scale(0.9);
+    transform: translateY(20px) scale(0.92);
     pointer-events: none;
 }
-
-/* 切換按鈕圖示 */
 #chatbot-toggle .close-icon { display: none; }
 #chatbot-toggle.active .open-icon { display: none; }
 #chatbot-toggle.active .close-icon { display: block; font-size: 20px; }
@@ -125,4 +149,16 @@ body {
     display: flex;
     flex-direction: column;
     padding: 15px !important;
+}
+
+/* ---------- 自訂捲軸（資源列表） ---------- */
+.scroll-soft::-webkit-scrollbar { width: 8px; }
+.scroll-soft::-webkit-scrollbar-thumb { background: rgba(10,38,35,0.18); border-radius: 9999px; }
+
+/* ---------- reduced motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .fade-in { animation: none; }
+    .quiz-option, .btn-press, #chatbot-toggle, #chatbot-window { transition: none; }
+    .quiz-option:hover, #chatbot-toggle:hover { transform: none; }
 }
