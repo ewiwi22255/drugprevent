@@ -19,7 +19,7 @@ def _serialize(doc):
 @quiz_bp.route("/quiz", methods=["GET"])
 def get_quiz():
     db = get_db()
-    questions = list(db.quizzes.find({}, {"correct": 0, "explanation": 0}))
+    questions = list(db.quizzes.find({}))
     for q in questions:
         q["id"] = str(q.pop("_id"))
     return jsonify(questions), 200
