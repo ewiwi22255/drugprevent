@@ -1,7 +1,7 @@
 <template>
     <div class="chat-wrapper">
         <div class="chat-header">
-            <span class="chat-title">🤖 DeepSeek AI 防制輔導員</span>
+            <span class="chat-title">AI 防治輔導員</span>
             <button class="clear-btn" @click="clearSession" title="清除對話">
                 🗑 清除
             </button>

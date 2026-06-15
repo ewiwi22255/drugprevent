@@ -134,6 +134,14 @@ a:focus-visible, button:focus-visible, select:focus-visible, textarea:focus-visi
     flex-direction: column;
     border: 1px solid rgba(10, 38, 35, 0.08);
 }
+/* Vue app 撐滿 chatbot-window */
+#chatbot-window #app {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
 .chatbot-hidden {
     opacity: 0;
     transform: translateY(20px) scale(0.92);
