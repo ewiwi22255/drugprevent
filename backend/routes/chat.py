@@ -10,6 +10,7 @@ from flask import Blueprint, jsonify, request
 from datetime import datetime, timezone
 from backend.db import get_db
 from backend.agent.runner import run_agent
+from backend.agent.safety import assess_risk, CRISIS_BANNER
 
 chat_bp = Blueprint("chat", __name__)
 
@@ -38,11 +39,30 @@ def chat():
     # 加入本次使用者訊息
     history.append({"role": "user", "content": user_message})
 
+    # 安全護欄：先在程式層評估風險（不依賴 LLM 自願）
+    risk = assess_risk(user_message)
+
     try:
         reply = run_agent(history)
     except Exception as e:
         print("【Agent 錯誤】:", str(e))
-        return jsonify({"error": str(e)}), 500
+        # 即使 Agent 掛掉，危機求助資訊也一定要送到使用者眼前
+        if risk == "crisis":
+            reply = CRISIS_BANNER + "目前 AI 輔導員暫時無法回應，但請務必使用上方的求助管道，或找一位你信任的大人陪你一起面對。"
+            history.append({"role": "assistant", "content": reply})
+            db.chat_sessions.update_one(
+                {"session_id": session_id},
+                {"$set": {"messages": history, "updated_at": _now(), "risk_level": risk},
+                 "$setOnInsert": {"created_at": _now()}},
+                upsert=True,
+            )
+            return jsonify({"reply": reply, "session_id": session_id, "risk": risk}), 200
+        # 非危機的內部錯誤：不外洩細節
+        return jsonify({"error": "系統忙線中，請稍後再試"}), 500
+
+    # 偵測到危機 → 不論 LLM 回什麼，強制在回覆最前面附上求助專線
+    if risk == "crisis":
+        reply = CRISIS_BANNER + reply
 
     # 加入 assistant 回覆
     history.append({"role": "assistant", "content": reply})
@@ -54,6 +74,7 @@ def chat():
             "$set": {
                 "messages"  : history,
                 "updated_at": _now(),
+                "risk_level": risk,
             },
             "$setOnInsert": {"created_at": _now()},
         },
@@ -63,6 +84,7 @@ def chat():
     return jsonify({
         "reply"     : reply,
         "session_id": session_id,
+        "risk"      : risk,
     }), 200
 
 
