@@ -116,7 +116,7 @@ let quizAnswers = [];
 
 async function loadQuizQuestions() {
     try {
-        const response = await fetch('http://127.0.0.1:5000/api/quiz');
+        const response = await fetch('/api/quiz');
         quizQuestions = await response.json();
         console.log('Quiz 題庫已從後端載入', quizQuestions);
     } catch (error) {
@@ -364,7 +364,7 @@ function showPreventionResults() {
     console.log('showPreventionResults: preventionScores =', preventionScores);
     trackEvent('prevention_test_completed', preventionScores);
     trackPreventionScore(preventionScores);
-    fetch('http://127.0.0.1:5000/api/prevention/submit', {
+    fetch('/api/prevention/submit', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -529,7 +529,7 @@ document.getElementById('help-form').addEventListener('submit', async function(e
     }
 
     try {
-        const response = await fetch('http://127.0.0.1:5000/api/anonymous', {
+        const response = await fetch('/api/anonymous', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
