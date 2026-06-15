@@ -60,6 +60,21 @@ export default {
             loading: false,
         };
     },
+    async mounted() {
+        if (!this.session_id) return;
+        try {
+            const res = await axios.get(`/api/chat/${this.session_id}`);
+            const history = res.data.messages || [];
+            // 只保留 user / assistant 的訊息，過濾掉 tool role
+            const visible = history.filter(m => m.role === 'user' || m.role === 'assistant');
+            if (visible.length > 0) {
+                this.messages = visible;
+                this.$nextTick(() => this.scrollToBottom());
+            }
+        } catch (e) {
+            // session 不存在或網路錯誤 → 維持歡迎訊息，不影響使用
+        }
+    },
     methods: {
         renderContent(text) {
             if (typeof marked !== 'undefined') {
