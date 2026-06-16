@@ -3,9 +3,8 @@
 This is our group's final report for the **Web Front-end Development** course. 
 
 ## 🔗 Project Links
-* **Live Demo:** [View Website on GitHub Pages](https://falltwo.github.io/index.html) — frontend preview only; the AI chatbot, quiz, map, and stats require the backend (see **Run Locally / Deployment** below).
 * **Presentation Slide:** [Canva Design](https://canva.link/78ek48mi7jt24mo)
-* **Data Source:** [Google Sheets](https://docs.google.com/spreadsheets/d/1OkDOvZJ_VGFSYYYItReGjcSyVfzW8FLWg-n5WHrk-Uk/edit?usp=sharing)
+
 
 ---
 
