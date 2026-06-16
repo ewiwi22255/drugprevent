@@ -4,15 +4,45 @@ This is our group's final report for the **Web Front-end Development** course.
 
 ## 🔗 Project Links
 * **Live Demo:** [View Website on GitHub Pages](https://falltwo.github.io/index.html) — frontend preview only; the AI chatbot, quiz, map, and stats require the backend (see **Run Locally / Deployment** below).
-* **Presentation Slide:** [Canva Design](https://www.canva.com/design/DAG78cKy_mk/NgBzIRuLATWwyZftN6judA/edit?utm_content=DAG78cKy_mk&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton)
+* **Presentation Slide:** [Canva Design](https://canva.link/78ek48mi7jt24mo)
 * **Data Source:** [Google Sheets](https://docs.google.com/spreadsheets/d/1OkDOvZJ_VGFSYYYItReGjcSyVfzW8FLWg-n5WHrk-Uk/edit?usp=sharing)
 
 ---
 
 ## 👥 Group Members
-* **Fang-Yi Su**
+* **You-Xun Chen**
 * **Sheng-Lin Chen**
-* **Yu-Ren Gao**
+* **En-Wei Hsu**
+* **Yi-Min Hung**
+
+## 📋 Team Responsibilities
+
+| Member | Project Architecture | Frontend | Backend | AI | Deployment | Slides / Report / Demo |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: |
+| **You-Xun Chen** | ✅ |  | ✅ | ✅ |  | ✅ |
+| **Sheng-Lin Chen** | ✅ | ✅ |  | ✅ | ✅ | ✅ |
+| **En-Wei Hsu** |  |  | ✅ |  |  |  |
+| **Yi-Min Hung** |  |  | ✅ |  |  |  |
+
+---
+
+## 📌 Project Overview
+
+This project is a drug prevention information platform designed for teenagers and the general public. It integrates educational content, an interactive resource map, quizzes, data visualization, anonymous help messages, and an AI prevention counselor to make prevention information easier to access and understand.
+
+The platform is built as a full-stack web application. The frontend provides an interactive user experience, while the backend manages API routes, database records, AI conversations, safety checks, and data retrieval.
+
+---
+
+## ✨ Key Features
+
+- **AI Prevention Counselor**: Provides multi-turn conversations about drug prevention topics.
+- **Resource Map**: Displays prevention and support resources through an interactive map.
+- **Myth-Busting Quiz**: Helps users review common misconceptions through quiz questions.
+- **Prevention Awareness Assessment**: Allows users to evaluate their prevention awareness across different dimensions.
+- **Anonymous Help Messages**: Lets users submit help requests or feedback without exposing personal identity.
+- **Data Dashboard**: Visualizes quiz results, participation data, and prevention-related statistics.
+- **Session-Based Chat History**: Uses `session_id` and MongoDB to keep conversation context across multiple turns.
 
 ---
 
@@ -32,15 +62,79 @@ We utilized a variety of modern frameworks and libraries to build a high-perform
 
 ---
 
-## 🌱 專案來源 / Project Origin
+## 🤖 AI Architecture
 
-本專案改作自原作者的個人專案 [falltwo/falltwo.github.io](https://github.com/falltwo/falltwo.github.io)，並經原作者授權使用。
+The AI chatbot is implemented as a custom Agent loop in the Flask backend. It uses **DeepSeek V4 Pro** through an OpenAI-compatible API provided by OpenCode Go. The backend calls the model with the OpenAI Python SDK and passes in the conversation history, system prompt, and available tool schemas.
+
+The Agent supports multi-turn context through `session_id`. Each user message is stored in MongoDB together with the assistant response, allowing the system to restore the previous conversation when the same session continues.
+
+The Agent also supports function calling. When the model determines that external data is needed, it can call backend tools such as resource lookup, statistics lookup, or quiz information lookup. The tool result is added back into the message context so the model can generate a final answer based on live project data.
+
+```text
+User Message
+    ↓
+Load chat history by session_id
+    ↓
+System Prompt + History
+    ↓
+DeepSeek V4 Pro Agent Loop
+    ↓
+Function Calling when needed
+    ↓
+Backend tools query MongoDB
+    ↓
+Final AI response
+    ↓
+Save response back to MongoDB
+```
+
+---
+
+## 🛡️ AI Ethics and Safety
+
+The AI counselor is designed as an information assistant, not a replacement for medical, psychological, legal, or emergency professionals. Because this project discusses drug prevention and youth support, safety and ethical considerations are part of the system design.
+
+- **Human Responsibility**: AI-generated responses should be reviewed critically and should not replace professional judgment.
+- **Crisis Handling**: The backend includes safety guardrails to detect crisis-related messages and force support information to appear when needed.
+- **Privacy Awareness**: Chat history is linked to a `session_id` instead of a real identity.
+- **Harm Reduction Boundaries**: The AI should not provide instructions for obtaining drugs, using drugs, or evading laws.
+- **Information Accuracy**: Important prevention or support information should be checked against official and professional resources.
+
+---
+
+## 📁 Project Structure
+
+```text
+.
+├── App.vue                     # Vue chatbot interface
+├── app.js                      # Vue app loader
+├── index.html                  # Main single-page frontend
+├── script.js                   # Main frontend interactions
+├── style.css                   # Global styles
+├── backend/
+│   ├── app.py                  # Flask app factory and route registration
+│   ├── config.py               # Environment configuration
+│   ├── db.py                   # MongoDB connection helper
+│   ├── agent/
+│   │   ├── runner.py           # Agent loop and function calling flow
+│   │   ├── tools.py            # Tool schemas and backend tool functions
+│   │   └── safety.py           # Risk detection and crisis support banner
+│   └── routes/                 # REST API routes
+├── seed/                       # Database seed scripts
+├── requirements.txt            # Python dependencies
+├── Procfile                    # Deployment start command
+└── runtime.txt                 # Python runtime version
+```
+
+---
+
+## 🌱 Project Origin
 
 This project is derived from the original personal project [falltwo/falltwo.github.io](https://github.com/falltwo/falltwo.github.io), used with the original author's permission.
 
 ---
 
-## 🚀 Run Locally / 本地執行
+## 🚀 Run Locally
 
 This is a **full-stack app** (Flask + MongoDB). The static `index.html` alone (e.g. on GitHub Pages) only renders the UI; the AI chatbot, quiz, resource map, and stats all require the backend.
 
@@ -53,7 +147,7 @@ This is a **full-stack app** (Flask + MongoDB). The static `index.html` alone (e
    ```
 4. Run the server: `python run.py` → open http://localhost:5000
 
-## ☁️ Deployment / 部署
+## ☁️ Deployment
 
 The app runs as a **single web service** — Flask serves both the SPA and the `/api` routes, so only the backend needs hosting.
 
